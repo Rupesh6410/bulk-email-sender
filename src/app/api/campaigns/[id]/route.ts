@@ -1,17 +1,18 @@
 // File: src/app/api/campaigns/[id]/route.ts
 
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "../../../../../lib/prisma"; // adjust if you're not using @ alias
 import { auth } from "../../../../../auth";
 
 // ✅ GET: Fetch campaign by ID
 export async function GET(
-  req: Request,
-  // Corrected type for context.params
-  context: { params: { id: string } }
+  req: NextRequest,
+  // Updated type for params - now Promise-based in Next.js 15
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const id = context.params.id;
-
+  // Await the params Promise
+  const { id } = await params;
+  
   if (!id) {
     return NextResponse.json({ error: "Invalid ID" }, { status: 400 });
   }
@@ -35,9 +36,9 @@ export async function GET(
 
 // ✅ DELETE: Delete campaign and its recipients
 export async function DELETE(
-  req: Request,
-  // Corrected type for context.params
-  context: { params: { id: string } }
+  req: NextRequest,
+  // Updated type for params - now Promise-based in Next.js 15
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await auth();
 
@@ -45,7 +46,8 @@ export async function DELETE(
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const id = context.params.id;
+  // Await the params Promise
+  const { id } = await params;
 
   try {
     // First delete all recipients
@@ -63,9 +65,9 @@ export async function DELETE(
 
 // ✅ PUT: Update campaign
 export async function PUT(
-  req: Request,
-  // Corrected type for context.params
-  context: { params: { id: string } }
+  req: NextRequest,
+  // Updated type for params - now Promise-based in Next.js 15
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await auth();
 
@@ -73,7 +75,8 @@ export async function PUT(
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const id = context.params.id;
+  // Await the params Promise
+  const { id } = await params;
 
   try {
     const data = await req.json();

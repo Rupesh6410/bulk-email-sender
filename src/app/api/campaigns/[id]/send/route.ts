@@ -6,20 +6,19 @@ import nodemailer from "nodemailer";
 
 export async function POST(
   req: NextRequest,
-  context: { params: { id: string } } 
+  { params }: { params: Promise<{ id: string }> } 
 ) {
   const session = await auth();
 
+  const { id } = await params;
   if (!session?.user?.email) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
  console.log("this is error here")
-  const campaignId = await context?.params?.id; 
- console.log("this is campaignId",campaignId)
   try {
-    console.log("here is campaignId",campaignId)
+    console.log("here is campaignId",id)
     const campaign = await prisma.campaign.findUnique({
-      where: { id: campaignId },
+      where: { id:  id },
       include: {
         recipients: true,
         user: true,
