@@ -1,26 +1,24 @@
 // File: src/app/api/campaigns/[id]/route.ts
 
-import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "../../../../../lib/prisma";
+import { NextResponse } from "next/server";
+import { prisma } from "../../../../../lib/prisma"; // adjust if you're not using @ alias
 import { auth } from "../../../../../auth";
 
 // ✅ GET: Fetch campaign by ID
 export async function GET(
-  req: NextRequest,
-  context: { params: { id: string } }
+  req: Request,
+  context: { params: Record<string, string> }
 ) {
   const id = context.params.id;
 
-  if (!id || typeof id !== "string") {
+  if (!id) {
     return NextResponse.json({ error: "Invalid ID" }, { status: 400 });
   }
 
   try {
     const campaign = await prisma.campaign.findUnique({
       where: { id },
-      include: {
-        recipients: true,
-      },
+      include: { recipients: true },
     });
 
     if (!campaign) {
@@ -36,10 +34,11 @@ export async function GET(
 
 // ✅ DELETE: Delete campaign and its recipients
 export async function DELETE(
-  req: NextRequest,
-  context: { params: { id: string } }
+  req: Request,
+  context: { params: Record<string, string> }
 ) {
   const session = await auth();
+
   if (!session?.user?.email) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -47,11 +46,11 @@ export async function DELETE(
   const id = context.params.id;
 
   try {
+    // First delete all recipients
     await prisma.recipient.deleteMany({ where: { campaignId: id } });
 
-    const deletedCampaign = await prisma.campaign.delete({
-      where: { id },
-    });
+    // Then delete the campaign
+    const deletedCampaign = await prisma.campaign.delete({ where: { id } });
 
     return NextResponse.json({ success: true, campaign: deletedCampaign });
   } catch (error) {
@@ -62,27 +61,30 @@ export async function DELETE(
 
 // ✅ PUT: Update campaign
 export async function PUT(
-  req: NextRequest,
-  context: { params: { id: string } }
+  req: Request,
+  context: { params: Record<string, string> }
 ) {
   const session = await auth();
+
   if (!session?.user?.email) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
+  const id = context.params.id;
 
   try {
     const data = await req.json();
     const { title, subject, body, design, recipients } = data;
 
     const updatedCampaign = await prisma.campaign.update({
-      where: { id: context.params.id },
+      where: { id },
       data: {
         title,
         subject,
         body,
         design,
         recipients: {
-          deleteMany: {}, // clean slate
+          deleteMany: {}, // Clear old recipients
           create: recipients?.map((r: any) => ({
             email: r.email,
             name: r.name,
