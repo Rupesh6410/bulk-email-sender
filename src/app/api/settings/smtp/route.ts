@@ -1,13 +1,12 @@
 import { validateSmtpInput } from "@/types/smtp"
 import { prisma } from "../../../../../lib/prisma"
 import { encrypt } from "@/lib/crypto"
-import { getServerSession } from "next-auth";
-import { authOptions } from "../../auth/[...nextauth]/route";
+import { auth } from "../../../../../auth"
 import { NextRequest } from "next/server";
 
 export async function POST(req: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
+    const session = await auth()
     if (!session?.user?.email) return new Response("Unauthorized", { status: 401 })
 
     const body = await req.json()

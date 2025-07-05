@@ -1,10 +1,10 @@
 // /app/api/campaigns/route.ts - Handles GET (list campaigns) and POST (create campaign)
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { auth } from "../../../../auth"
 import { prisma } from "../../../../lib/prisma";
 
 export async function GET() {
+  const session = await auth()
   const campaigns = await prisma.campaign.findMany({
     orderBy: { createdAt: "desc" },
     include: {
@@ -40,7 +40,7 @@ export async function GET() {
 
 
 export async function POST(req: Request) {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
   if (!session?.user?.email) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }

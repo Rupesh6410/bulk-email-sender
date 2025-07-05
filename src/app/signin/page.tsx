@@ -10,13 +10,13 @@ export default function SignInPage() {
   const router = useRouter();
 
   useEffect(() => {
-    if (status === "authenticated") {
-      router.push("/dashboard");
+    if (session?.user?.email) {
+      router.push("/");
     }
-  }, [status, router]);
+  }, [session, router]);
 
   // 🔒 Don't render anything while loading or if already authenticated
-  if (status === "loading" || status === "authenticated") return null;
+  if (status === "loading" || session?.user?.email) return null;
 
   return (
     <main className="min-h-screen flex items-center justify-center bg-background text-foreground px-4">
