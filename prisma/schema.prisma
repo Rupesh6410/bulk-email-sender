@@ -16,6 +16,7 @@ model User {
   accounts       Account[]
   sessions       Session[]
   campaigns      Campaign[]
+    smtpConfig     SmtpConfig?  
 }
 
 model Campaign {
@@ -70,3 +71,13 @@ model Session {
   user         User     @relation(fields: [userId], references: [id])
 }
 
+model SmtpConfig {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  host      String
+  port      Int
+  username  String
+  password  String  // encrypted
+  secure    Boolean
+  user      User    @relation(fields: [userId], references: [id])
+}

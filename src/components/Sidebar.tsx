@@ -15,6 +15,7 @@ export default function Sidebar() {
     { href: "/dashboard", label: "Dashboard" },
     { href: "/history", label: "History" },
     { href: "/campaigns", label: "Create Campaign" },
+    { href: "/settings/smtp", label: "Settings" },
   ];
 
   return (
