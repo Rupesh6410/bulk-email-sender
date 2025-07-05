@@ -7,7 +7,8 @@ import { auth } from "../../../../../auth";
 // ✅ GET: Fetch campaign by ID
 export async function GET(
   req: Request,
-  context: { params: Record<string, string> }
+  // Corrected type for context.params
+  context: { params: { id: string } }
 ) {
   const id = context.params.id;
 
@@ -35,7 +36,8 @@ export async function GET(
 // ✅ DELETE: Delete campaign and its recipients
 export async function DELETE(
   req: Request,
-  context: { params: Record<string, string> }
+  // Corrected type for context.params
+  context: { params: { id: string } }
 ) {
   const session = await auth();
 
@@ -62,7 +64,8 @@ export async function DELETE(
 // ✅ PUT: Update campaign
 export async function PUT(
   req: Request,
-  context: { params: Record<string, string> }
+  // Corrected type for context.params
+  context: { params: { id: string } }
 ) {
   const session = await auth();
 
